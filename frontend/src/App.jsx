@@ -1,3 +1,4 @@
+import React from "react"; // Ensure this is present
 import { Container, Stack, Text } from "@chakra-ui/react";
 import Navbar from "./components/Navbar";
 import UserGrid from "./components/UserGrid";

@@ -1,3 +1,4 @@
+import React from "react"; // Ensure this is present
 import { Flex, Grid, Spinner, Text } from "@chakra-ui/react";
 
 import UserCard from "./UserCard";
