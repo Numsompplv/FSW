@@ -1,3 +1,4 @@
+import React from "react";
 import { Avatar, Box, Card, CardBody, CardHeader, Flex, Heading, IconButton, Text, useToast } from "@chakra-ui/react";
 import { BiTrash } from "react-icons/bi";
 import EditModal from "./EditModal";

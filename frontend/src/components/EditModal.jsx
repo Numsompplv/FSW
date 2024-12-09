@@ -1,3 +1,4 @@
+import React from "react";
 import {
 	Button,
 	Flex,
@@ -19,6 +20,7 @@ import {
 import { useState } from "react";
 import { BiEditAlt } from "react-icons/bi";
 import { BASE_URL } from "../App";
+
 
 function EditModal({ setUsers, user }) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
