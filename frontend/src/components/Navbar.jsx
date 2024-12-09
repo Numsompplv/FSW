@@ -18,7 +18,7 @@ const Navbar = ({ setUsers }) => {
 						gap={3}
 						display={{ base: "none", sm: "flex" }}
 					>
-						<img src='/logo.png' alt='React logo' width={100} height={100} />
+						<img src='/pizzas.png' alt='React logo' width={100} height={100} />
 					
 					</Flex>
 					{/* Right side */}
