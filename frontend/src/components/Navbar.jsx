@@ -19,8 +19,11 @@ const Navbar = ({ setUsers }) => {
 						display={{ base: "none", sm: "flex" }}
 					>
 						<img src='/pizzas.png' alt='React logo' width={100} height={100} />
+						
+
 					
 					</Flex>
+
 					{/* Right side */}
 
 					<Flex gap={3} alignItems={"center"}>
