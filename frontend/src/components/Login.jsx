@@ -1,14 +1,24 @@
-import React, { useState } from "react";
-import { Container, Input, Button, Stack, Text } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
+import { Container, Input, Button, Stack, Text, Link } from "@chakra-ui/react";
+import { useNavigate, useLocation } from "react-router-dom";
 
-// Replace BASE_URL with your backend's base URL
-const BASE_URL = "http://127.0.0.1:5000/api"; // Ensure this matches your backend
+const BASE_URL = "http://127.0.0.1:5000/api";
 
 const Login = ({ setUser }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Check for a success message passed via state from registration
+    if (location.state?.successMessage) {
+      setSuccess(location.state.successMessage);
+    }
+  }, [location.state]);
 
   const handleLogin = async () => {
     try {
@@ -50,6 +60,12 @@ const Login = ({ setUser }) => {
         {error && <Text color="red.500">{error}</Text>}
         {success && <Text color="green.500">{success}</Text>}
         <Button onClick={handleLogin}>Login</Button>
+        <Text fontSize="sm">
+          Don't have an account?{" "}
+          <Link color="blue.500" onClick={() => navigate("/register")}>
+            Register as a new User
+          </Link>
+        </Text>
       </Stack>
     </Container>
   );

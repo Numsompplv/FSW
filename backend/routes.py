@@ -2,24 +2,26 @@ from app import app, db
 from flask import request, jsonify, session
 from models import Friend, User
 
-# User-related routes
 @app.route("/api/register", methods=["POST"])
 def register_user():
     data = request.json
     username = data.get("username")
     password = data.get("password")
+
     if not username or not password:
         return jsonify({"error": "Username and password are required"}), 400
 
     if User.query.filter_by(username=username).first():
         return jsonify({"error": "User already exists"}), 400
 
+    # Create a new user with the default 'user' role
     new_user = User(username=username)
     new_user.set_password(password)
     db.session.add(new_user)
     db.session.commit()
 
     return jsonify(new_user.to_json()), 201
+
 
 @app.route("/api/login", methods=["POST"])
 def login_user():
