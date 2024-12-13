@@ -1,28 +1,30 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Flex, Grid, Spinner, Text } from "@chakra-ui/react";
-
 import UserCard from "./UserCard";
-import { useEffect, useState } from "react";
 import { BASE_URL } from "../App";
+import SearchBar from "./SearchBar";
 
 const UserGrid = ({ users, setUsers }) => {
   const [isLoading, setIsLoading] = useState(true);
+  const [filteredUsers, setFilteredUsers] = useState([]); // For search filtering
 
+  // Fetch friends on component mount
   useEffect(() => {
     const getUsers = async () => {
       try {
         const res = await fetch(BASE_URL + "/friends", {
           method: "GET",
-          credentials: "include", // Ensure session is included
+          credentials: "include", // Include session to fetch user-specific friends
         });
         const data = await res.json();
 
         if (!res.ok) {
           throw new Error(data.error);
         }
-        setUsers(data); // Set user-specific friends
+        setUsers(data); // Set all friends from the backend
+        setFilteredUsers(data); // Initialize filtered users with all friends
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching friends:", error);
       } finally {
         setIsLoading(false);
       }
@@ -30,8 +32,25 @@ const UserGrid = ({ users, setUsers }) => {
     getUsers();
   }, [setUsers]);
 
+  // Function to handle search queries
+  const handleSearch = (query) => {
+    const lowerQuery = query.toLowerCase();
+    const filtered = users.filter((user) =>
+      user.name.toLowerCase().includes(lowerQuery)
+    );
+    setFilteredUsers(filtered); // Update the displayed users based on the search
+  };
+
+  // Ensure `filteredUsers` is updated when `users` changes
+  useEffect(() => {
+    setFilteredUsers(users);
+  }, [users]);
+
   return (
     <>
+      {/* Show SearchBar only if there are users */}
+      {users.length > 0 && <SearchBar onSearch={handleSearch} />}
+
       <Grid
         templateColumns={{
           base: "1fr",
@@ -40,7 +59,7 @@ const UserGrid = ({ users, setUsers }) => {
         }}
         gap={4}
       >
-        {users.map((user) => (
+        {filteredUsers.map((user) => (
           <UserCard key={user.id} user={user} setUsers={setUsers} />
         ))}
       </Grid>
@@ -63,4 +82,5 @@ const UserGrid = ({ users, setUsers }) => {
     </>
   );
 };
+
 export default UserGrid;
