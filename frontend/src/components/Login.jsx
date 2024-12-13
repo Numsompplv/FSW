@@ -25,13 +25,13 @@ const Login = ({ setUser }) => {
       const response = await fetch(`${BASE_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // Include session in request
         body: JSON.stringify({ username, password }),
       });
       const data = await response.json();
       if (response.ok) {
         setUser(data.user); // Update user state in parent component
-        setSuccess(`Welcome, ${data.user.username}!`);
-        setError("");
+        navigate("/users"); // Redirect to user dashboard
       } else {
         setError(data.error || "Login failed");
         setSuccess("");

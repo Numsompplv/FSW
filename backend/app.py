@@ -34,16 +34,16 @@ def initialize_predefined_users():
         {"username": "user", "password": "user123", "role": "user"},
     ]
     for user_data in predefined_users:
-        # Check if the user already exists
         if not User.query.filter_by(username=user_data["username"]).first():
             user = User(username=user_data["username"])
-            user.set_password(user_data["password"])  # Hash the password
+            user.set_password(user_data["password"])
             user.role = user_data["role"]
             db.session.add(user)
     db.session.commit()
 
 with app.app_context():
-    db.create_all()  # Create database tables
+    db.drop_all()  # Drop existing tables
+    db.create_all()  # Create new tables
     initialize_predefined_users()  # Add predefined users
 
 if __name__ == "__main__":
