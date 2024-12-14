@@ -1,11 +1,14 @@
 import React from "react";
-import { Box, Button, Container, Flex, Text, useColorMode, useColorModeValue } from "@chakra-ui/react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Box, Button, Container, Flex, Text, useColorMode, useColorModeValue, Link } from "@chakra-ui/react";
 import { IoMoon } from "react-icons/io5";
 import { LuSun } from "react-icons/lu";
 import CreateUserModal from "./CreateUserModal";
 
 const Navbar = ({ user, setUser, setUsers }) => {
   const { colorMode, toggleColorMode } = useColorMode();
+  const navigate = useNavigate();
+
 
   const handleLogout = () => {
     setUser(null); // Clear user state
@@ -19,7 +22,9 @@ const Navbar = ({ user, setUser, setUsers }) => {
         <Flex h="16" alignItems={"center"} justifyContent={"space-between"}>
           {/* Left side */}
           <Flex alignItems={"center"} justifyContent={"center"} gap={3} display={{ base: "flex" }}>
-            <img src="/pizzas.png" alt="React logo" width={100} height={100} />
+			<Link onClick={() => navigate("/")}>
+            	<img src="/pizzas.png" alt="React logo" width={100} height={100} />
+			</Link>
             {user && ( // Show username next to the pizza logo if user is logged in
               <Text fontSize="lg" fontWeight="bold">
                 Welcome, {user.username}!
@@ -29,6 +34,10 @@ const Navbar = ({ user, setUser, setUsers }) => {
 
           {/* Right side */}
           <Flex gap={3} alignItems={"center"}>
+
+		  <Button onClick={() => navigate("/aboutus")} colorScheme="teal" variant="solid">
+              ABOUT US
+            </Button>
             <Button onClick={toggleColorMode}>
               {colorMode === "light" ? <IoMoon /> : <LuSun size={20} />}
             </Button>

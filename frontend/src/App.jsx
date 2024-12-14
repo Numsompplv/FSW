@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import UserGrid from "./components/UserGrid";
+import Aboutus from "./components/AboutUs";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
 export const BASE_URL =
@@ -64,6 +65,16 @@ function App() {
               }
             />
 
+
+			<Route
+              path="/aboutus"
+              element={(
+                  <Aboutus setUser={setUser} />
+                )
+              }
+            />
+			
+
             {/* User Dashboard (User Grid) */}
             <Route
               path="/users"
@@ -75,6 +86,7 @@ function App() {
                 )
               }
             />
+
           </Routes>
         </Container>
       </Stack>
