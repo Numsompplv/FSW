@@ -3,15 +3,14 @@ from flask import request, jsonify, session
 from models import Friend, User
 from functools import wraps
 import os
+import uuid
+import datetime
+from flask_mail import Message
 from werkzeug.utils import secure_filename
 
 # Configure file upload
-# Resolve UPLOAD_FOLDER relative to the backend folder
 current_directory = os.path.abspath(os.getcwd())  # Backend directory
 UPLOAD_FOLDER = os.path.abspath(os.path.join(current_directory, "..", "frontend", "public", "uploads"))
-
-# Debug: Print the resolved uploads folder path
-print("Resolved UPLOAD_FOLDER:", UPLOAD_FOLDER)
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -88,8 +87,7 @@ def logout_user():
 def get_friends():
     user_id = session["user_id"]
     friends = Friend.query.filter_by(user_id=user_id).all()
-    result = [friend.to_json() for friend in friends]
-    return jsonify(result)
+    return jsonify([friend.to_json() for friend in friends])
 
 
 # Create a new friend
@@ -100,12 +98,13 @@ def create_friend():
         user_id = session["user_id"]
         data = request.form
 
-        # Required fields
+        # Validate required fields
         required_fields = ["name", "role", "description", "gender"]
         for field in required_fields:
-            if field not in data or not data.get(field):
+            if not data.get(field):
                 return jsonify({"error": f"Missing required field: {field}"}), 400
 
+        # Extract data
         name = data.get("name")
         role = data.get("role")
         description = data.get("description")
@@ -119,9 +118,9 @@ def create_friend():
                 filename = secure_filename(file.filename)
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(file_path)
-                img_url = f"/uploads/{filename}"  # Relative path for serving in the frontend
+                img_url = f"/uploads/{filename}"
 
-        # Default image logic
+        # Set default image if none uploaded
         if not img_url:
             img_url = (
                 f"https://avatar.iran.liara.run/public/boy?username={name}"
@@ -129,10 +128,10 @@ def create_friend():
                 else f"https://avatar.iran.liara.run/public/girl?username={name}"
             )
 
+        # Create new friend
         new_friend = Friend(
             name=name, role=role, description=description, gender=gender, img_url=img_url, user_id=user_id
         )
-
         db.session.add(new_friend)
         db.session.commit()
 
@@ -169,7 +168,7 @@ def update_friend(id):
                 filename = secure_filename(file.filename)
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(file_path)
-                friend.img_url = f"/uploads/{filename}"  # Update the image URL
+                friend.img_url = f"/uploads/{filename}"
 
         db.session.commit()
 
@@ -193,8 +192,70 @@ def delete_friend(id):
 
         db.session.delete(friend)
         db.session.commit()
-        return jsonify({"msg": "Friend deleted"}), 200
+        return jsonify({"message": "Friend deleted"}), 200
 
     except Exception as e:
         db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+
+# Request password reset
+@app.route("/api/reset-password", methods=["POST"])
+def reset_password():
+    try:
+        data = request.json
+        email = data.get("email")
+
+        if not email:
+            return jsonify({"error": "Email is required"}), 400
+
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({"error": "Email not found"}), 404
+
+        # Generate a unique token
+        reset_token = str(uuid.uuid4())
+        user.set_reset_token(reset_token)
+        db.session.commit()
+
+        # Send email
+        msg = Message("Password Reset Request", recipients=[email])
+        msg.body = f"""
+        Hi {user.username},
+
+        Use the following token to reset your password:
+        {reset_token}
+
+        This token will expire in 15 minutes.
+        """
+        mail.send(msg)
+        return jsonify({"message": "Reset token sent to your email."}), 200
+
+    except Exception as e:
+        return jsonify({"error": f"Failed to send email: {str(e)}"}), 500
+
+
+# Confirm password reset
+@app.route("/api/confirm-reset-password", methods=["POST"])
+def confirm_reset_password():
+    try:
+        data = request.json
+        email = data.get("email")
+        token = data.get("token")
+        new_password = data.get("new_password")
+
+        user = User.query.filter_by(email=email).first()
+        if not user or user.reset_token != token:
+            return jsonify({"error": "Invalid token or email"}), 400
+
+        if datetime.datetime.utcnow() > user.reset_token_expiry:
+            return jsonify({"error": "Reset token expired"}), 400
+
+        user.set_password(new_password)
+        user.clear_reset_token()
+        db.session.commit()
+
+        return jsonify({"message": "Password updated successfully"}), 200
+
+    except Exception as e:
         return jsonify({"error": str(e)}), 500
