@@ -61,6 +61,12 @@ const Login = ({ setUser }) => {
         {success && <Text color="green.500">{success}</Text>}
         <Button onClick={handleLogin}>Login</Button>
         <Text fontSize="sm">
+          Forgot your password?{" "}
+          <Link color="blue.500" onClick={() => navigate("/reset-password")}>
+            Reset it here
+          </Link>
+        </Text>
+        <Text fontSize="sm">
           Don't have an account?{" "}
           <Link color="blue.500" onClick={() => navigate("/register")}>
             Register as a new User

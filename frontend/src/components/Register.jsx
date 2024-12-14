@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState(""); // New email state
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState(""); // New confirm password state
   const [error, setError] = useState("");
@@ -21,7 +22,7 @@ const Register = () => {
       const response = await fetch(`${BASE_URL}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, email, password }),
       });
       const data = await response.json();
       if (response.ok) {
@@ -44,6 +45,12 @@ const Register = () => {
           onChange={(e) => setUsername(e.target.value)}
         />
         <Input
+          placeholder="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)} // Handle email input
+        />
+        <Input
           placeholder="Password"
           type="password"
           value={password}
@@ -53,7 +60,7 @@ const Register = () => {
           placeholder="Confirm Password"
           type="password"
           value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)} // Handle confirm password input
+          onChange={(e) => setConfirmPassword(e.target.value)}
         />
         {error && <Text color="red.500">{error}</Text>}
         <Button onClick={handleRegister}>Register</Button>
