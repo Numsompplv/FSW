@@ -12,7 +12,7 @@ export const BASE_URL =
 
 function App() {
   const [user, setUser] = useState(null); // State for managing logged-in user
-  const [users, setUsers] = useState([]); // State for managing the list of users
+  const [users, setUsers] = useState([]); // State for managing the list of friends
 
   return (
     <Router>

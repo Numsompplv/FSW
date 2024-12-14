@@ -129,6 +129,45 @@ def delete_friend(id):
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
+
+# Update a friend's details
+@app.route("/api/friends/<int:id>", methods=["PUT"])
+@login_required
+def update_friend(id):
+    try:
+        user_id = session["user_id"]  # Get the logged-in user's ID
+        friend = Friend.query.filter_by(id=id, user_id=user_id).first()  # Ensure the friend belongs to the logged-in user
+
+        if not friend:
+            return jsonify({"error": "Friend not found"}), 404
+
+        # Get the updated data from the request
+        data = request.json
+
+        # Update the friend's details (only if the fields are provided in the request)
+        friend.name = data.get("name", friend.name)
+        friend.role = data.get("role", friend.role)
+        friend.description = data.get("description", friend.description)
+        friend.gender = data.get("gender", friend.gender)
+
+        # Update the avatar URL if gender is updated
+        if "gender" in data:
+            if friend.gender == "male":
+                friend.img_url = f"https://avatar.iran.liara.run/public/boy?username={friend.name}"
+            elif friend.gender == "female":
+                friend.img_url = f"https://avatar.iran.liara.run/public/girl?username={friend.name}"
+
+        # Commit changes to the database
+        db.session.commit()
+
+        # Return the updated friend details
+        return jsonify(friend.to_json()), 200
+
+    except Exception as e:
+        db.session.rollback()  # Rollback in case of an error
+        return jsonify({"error": str(e)}), 500
+
+
 # Request password reset
 @app.route("/api/reset-password", methods=["POST"])
 def reset_password():

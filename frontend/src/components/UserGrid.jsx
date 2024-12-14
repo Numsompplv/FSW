@@ -6,23 +6,21 @@ import SearchBar from "./SearchBar";
 
 const UserGrid = ({ users, setUsers }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [filteredUsers, setFilteredUsers] = useState([]); // For search filtering
+  const [filteredUsers, setFilteredUsers] = useState([]);
 
-  // Fetch friends on component mount
   useEffect(() => {
     const getUsers = async () => {
       try {
         const res = await fetch(BASE_URL + "/friends", {
           method: "GET",
-          credentials: "include", // Include session to fetch user-specific friends
+          credentials: "include",
         });
         const data = await res.json();
-
         if (!res.ok) {
           throw new Error(data.error);
         }
-        setUsers(data); // Set all friends from the backend
-        setFilteredUsers(data); // Initialize filtered users with all friends
+        setUsers(data);
+        setFilteredUsers(data);
       } catch (error) {
         console.error("Error fetching friends:", error);
       } finally {
@@ -32,25 +30,21 @@ const UserGrid = ({ users, setUsers }) => {
     getUsers();
   }, [setUsers]);
 
-  // Function to handle search queries
   const handleSearch = (query) => {
     const lowerQuery = query.toLowerCase();
     const filtered = users.filter((user) =>
       user.name.toLowerCase().includes(lowerQuery)
     );
-    setFilteredUsers(filtered); // Update the displayed users based on the search
+    setFilteredUsers(filtered);
   };
 
-  // Ensure `filteredUsers` is updated when `users` changes
   useEffect(() => {
     setFilteredUsers(users);
   }, [users]);
 
   return (
     <>
-      {/* Show SearchBar only if there are users */}
       {users.length > 0 && <SearchBar onSearch={handleSearch} />}
-
       <Grid
         templateColumns={{
           base: "1fr",
