@@ -6,7 +6,12 @@ import os
 from werkzeug.utils import secure_filename
 
 # Configure file upload
-UPLOAD_FOLDER = os.path.abspath(r"C:\xampp\htdocs\FSW\frontend\public\uploads")
+# Resolve UPLOAD_FOLDER relative to the backend folder
+current_directory = os.path.abspath(os.getcwd())  # Backend directory
+UPLOAD_FOLDER = os.path.abspath(os.path.join(current_directory, "..", "frontend", "public", "uploads"))
+
+# Debug: Print the resolved uploads folder path
+print("Resolved UPLOAD_FOLDER:", UPLOAD_FOLDER)
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
