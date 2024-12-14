@@ -31,26 +31,38 @@ function EditModal({ setUsers, user }) {
     description: user.description,
     gender: user.gender,
   });
+  const [image, setImage] = useState(null); // For storing the uploaded image
   const toast = useToast();
 
   const handleEditUser = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
+      // Create form data to send updated details and image
+      const formData = new FormData();
+      formData.append("name", inputs.name);
+      formData.append("role", inputs.role);
+      formData.append("description", inputs.description);
+      formData.append("gender", inputs.gender);
+      if (image) {
+        formData.append("image", image);
+      }
+
       const res = await fetch(BASE_URL + "/friends/" + user.id, {
-        method: "PUT", // Changed from PATCH to PUT
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(inputs),
+        method: "PUT",
+        body: formData,
       });
+
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error);
       }
+
+      // Update the users list with the new data
       setUsers((prevUsers) =>
         prevUsers.map((u) => (u.id === user.id ? data : u))
       );
+
       toast({
         status: "success",
         title: "Yayy! 🎉",
@@ -141,6 +153,15 @@ function EditModal({ setUsers, user }) {
                     <Radio value="female">Female</Radio>
                   </Flex>
                 </RadioGroup>
+              </FormControl>
+
+              <FormControl mt={4}>
+                <FormLabel>Profile Picture (Optional)</FormLabel>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImage(e.target.files[0])} // Save the uploaded file
+                />
               </FormControl>
             </ModalBody>
 

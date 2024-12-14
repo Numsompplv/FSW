@@ -30,19 +30,28 @@ const CreateUserModal = ({ setUsers }) => {
     description: "",
     gender: "",
   });
+  const [image, setImage] = useState(null); // For the uploaded image
   const toast = useToast();
 
   const handleCreateUser = async (e) => {
     e.preventDefault(); // Prevent page refresh
     setIsLoading(true);
+
     try {
+      // Create form data to send both text inputs and the image
+      const formData = new FormData();
+      formData.append("name", inputs.name);
+      formData.append("role", inputs.role);
+      formData.append("description", inputs.description);
+      formData.append("gender", inputs.gender);
+      if (image) {
+        formData.append("image", image);
+      }
+
       const res = await fetch(BASE_URL + "/friends", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         credentials: "include", // Ensure session is included for user-specific operations
-        body: JSON.stringify(inputs),
+        body: formData,
       });
 
       const data = await res.json();
@@ -60,13 +69,14 @@ const CreateUserModal = ({ setUsers }) => {
       onClose();
       setUsers((prevUsers) => [...prevUsers, data]);
 
-      // Clear inputs
+      // Clear inputs and image
       setInputs({
         name: "",
         role: "",
         description: "",
         gender: "",
       });
+      setImage(null);
     } catch (error) {
       toast({
         status: "error",
@@ -94,7 +104,7 @@ const CreateUserModal = ({ setUsers }) => {
 
             <ModalBody pb={6}>
               <Flex alignItems={"center"} gap={4}>
-                {/* Left */}
+                {/* Full Name */}
                 <FormControl>
                   <FormLabel>Full Name</FormLabel>
                   <Input
@@ -106,7 +116,7 @@ const CreateUserModal = ({ setUsers }) => {
                   />
                 </FormControl>
 
-                {/* Right */}
+                {/* Role */}
                 <FormControl>
                   <FormLabel>Role</FormLabel>
                   <Input
@@ -119,6 +129,7 @@ const CreateUserModal = ({ setUsers }) => {
                 </FormControl>
               </Flex>
 
+              {/* Description */}
               <FormControl mt={4}>
                 <FormLabel>Description</FormLabel>
                 <Textarea
@@ -132,6 +143,7 @@ const CreateUserModal = ({ setUsers }) => {
                 />
               </FormControl>
 
+              {/* Gender */}
               <RadioGroup
                 mt={4}
                 onChange={(value) => setInputs({ ...inputs, gender: value })}
@@ -142,6 +154,16 @@ const CreateUserModal = ({ setUsers }) => {
                   <Radio value="female">Female</Radio>
                 </Flex>
               </RadioGroup>
+
+              {/* Image Upload */}
+              <FormControl mt={4}>
+                <FormLabel>Profile Picture (Optional)</FormLabel>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImage(e.target.files[0])} // Save the uploaded file
+                />
+              </FormControl>
             </ModalBody>
 
             <ModalFooter>
