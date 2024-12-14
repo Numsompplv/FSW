@@ -6,10 +6,17 @@ import { useNavigate } from "react-router-dom";
 const Register = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState(""); // New confirm password state
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleRegister = async () => {
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
     try {
       const response = await fetch(`${BASE_URL}/register`, {
         method: "POST",
@@ -41,6 +48,12 @@ const Register = () => {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+        />
+        <Input
+          placeholder="Confirm Password"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)} // Handle confirm password input
         />
         {error && <Text color="red.500">{error}</Text>}
         <Button onClick={handleRegister}>Register</Button>
