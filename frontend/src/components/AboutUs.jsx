@@ -5,12 +5,20 @@ import React from "react";
 
 // const BASE_URL = "http://127.0.0.1:5000/api";
 
-const Aboutus = ({ }) => {
-
-
-  return (
-    <h1>hello</h1>
-  );
-};
-
-export default Aboutus;
+const Aboutus = () => {
+    return (
+      <div className="sqs-block-content">
+        <div className="sqs-html-content">
+          <h1 style={{ textAlign: "center", whiteSpace: "pre-wrap" }}>
+            "You have a problem with not remembering your friends?"
+          </h1>
+          <br />
+          We're here to help, don't worry...
+          <br />
+          Let's get to know a bit about us, shall we?...
+        </div>
+      </div>
+    );
+  };
+  
+  export default Aboutus;

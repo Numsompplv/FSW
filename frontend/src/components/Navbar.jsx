@@ -38,15 +38,16 @@ const Navbar = ({ user, setUser, setUsers }) => {
 		  <Button onClick={() => navigate("/aboutus")} colorScheme="teal" variant="solid">
               ABOUT US
             </Button>
-            <Button onClick={toggleColorMode}>
-              {colorMode === "light" ? <IoMoon /> : <LuSun size={20} />}
-            </Button>
+            
             {user && (
               <Button colorScheme="red" onClick={handleLogout}>
                 Logout
               </Button>
             )}
             {user && <CreateUserModal setUsers={setUsers} />}
+			<Button onClick={toggleColorMode}>
+              {colorMode === "light" ? <IoMoon /> : <LuSun size={20} />}
+            </Button>
           </Flex>
         </Flex>
       </Box>
